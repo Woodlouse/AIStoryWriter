@@ -120,6 +120,24 @@ class Interface:
                     print(f"Warning, ")
                     raise Exception(f"Model Provider {Provider} for {Model} not found")
 
+    def count_words(self, text: str) -> int:
+        """
+        更准确地计算文本中的单词数量
+        支持英文分词和简单的CJK字符计数
+        """
+        text = text.strip()
+        if not text:
+            return 0
+            
+        # 检查是否包含CJK字符
+        if any(u'\u4e00' <= char <= u'\u9fff' for char in text):
+            # 对于中文等CJK文字,每个字符视为一个词
+            return len([char for char in text if u'\u4e00' <= char <= u'\u9fff'])
+        else:
+            # 对于英文,使用更robust的分词方式
+            words = [w for w in text.split() if w.strip()]
+            return len(words)
+
     def SafeGenerateText(
         self,
         _Logger,
@@ -140,11 +158,11 @@ class Interface:
         print(f"size(_Messages)={len(_Messages)}")
         NewMsg = self.ChatAndStreamResponse(_Logger, _Messages, _Model, _SeedOverride, _Format)
 
-        while (self.GetLastMessageText(NewMsg).strip() == "") or (len(self.GetLastMessageText(NewMsg).split(" ")) < _MinWordCount):
+        while (self.GetLastMessageText(NewMsg).strip() == "") or (self.count_words(self.GetLastMessageText(NewMsg)) < _MinWordCount):
             if self.GetLastMessageText(NewMsg).strip() == "":
                 _Logger.Log("SafeGenerateText: Generation Failed Due To Empty (Whitespace) Response, Reattempting Output", 7)
-            elif (len(self.GetLastMessageText(NewMsg).split(" ")) < _MinWordCount):
-                _Logger.Log(f"SafeGenerateText: Generation Failed Due To Short Response ({len(self.GetLastMessageText(NewMsg).split(' '))}, min is {_MinWordCount}), Reattempting Output", 7)
+            elif (self.count_words(self.GetLastMessageText(NewMsg)) < _MinWordCount):
+                _Logger.Log(f"SafeGenerateText: Generation Failed Due To Short Response ({self.count_words(self.GetLastMessageText(NewMsg))}, min is {_MinWordCount}), Reattempting Output", 7)
 
             _Messages.pop() # Remove failed attempt
             print(f"size(_Messages)={len(_Messages)}")
@@ -172,7 +190,7 @@ class Interface:
 
             except Exception as e:
                 _Logger.Log(f"JSON Error during parsing: {e}", 7)
-                del _Messages[-1] # Remove failed attempt
+                _Messages.pop() # Remove failed attempt
                 Response = self.ChatAndStreamResponse(_Logger, _Messages, _Model, random.randint(0, 99999), _Format = "JSON")
 
 
