@@ -1,31 +1,32 @@
 INITIAL_OUTLINE_WRITER_MODEL = (
-    "ollama://llama3:70b"  # Note this value is overridden by the argparser
+    "ollama://llama3.2"  # Note this value is overridden by the argparser
 )
 CHAPTER_OUTLINE_WRITER_MODEL = (
-    "ollama://llama3:70b"  # Note this value is overridden by the argparser
+    "ollama://llama3.2"  # Note this value is overridden by the argparser
 )
-CHAPTER_STAGE1_WRITER_MODEL = "ollama://llama3:70b"  # Note this value is overridden by the argparser
-CHAPTER_STAGE2_WRITER_MODEL = "ollama://llama3:70b"  # Note this value is overridden by the argparser
-CHAPTER_STAGE3_WRITER_MODEL = "ollama://llama3:70b"  # Note this value is overridden by the argparser
-CHAPTER_STAGE4_WRITER_MODEL = "ollama://llama3:70b"  # Note this value is overridden by the argparser
+CHAPTER_WRITER_MODEL = ("ollama://llama3.2")
+CHAPTER_STAGE1_WRITER_MODEL = "ollama://llama3.2"  # Note this value is overridden by the argparser
+CHAPTER_STAGE2_WRITER_MODEL = "ollama://llama3.2"  # Note this value is overridden by the argparser
+CHAPTER_STAGE3_WRITER_MODEL = "ollama://llama3.2"  # Note this value is overridden by the argparser
+CHAPTER_STAGE4_WRITER_MODEL = "ollama://llama3.2"  # Note this value is overridden by the argparser
 CHAPTER_REVISION_WRITER_MODEL = (
-    "ollama://llama3:70b"  # Note this value is overridden by the argparser
+    "ollama://llama3.2"  # Note this value is overridden by the argparser
 )
-REVISION_MODEL = "ollama://llama3:70b"  # Note this value is overridden by the argparser
-EVAL_MODEL = "ollama://llama3:70b"  # Note this value is overridden by the argparser
-INFO_MODEL = "ollama://llama3:70b"  # Note this value is overridden by the argparser
-SCRUB_MODEL = "ollama://llama3:70b"  # Note this value is overridden by the argparser
-CHECKER_MODEL = "ollama://llama3:70b"  # Model used to check results
-TRANSLATOR_MODEL = "ollama://llama3:70b"
+REVISION_MODEL = "ollama://llama3.2"  # Note this value is overridden by the argparser
+EVAL_MODEL = "ollama://llama3.2"  # Note this value is overridden by the argparser
+INFO_MODEL = "ollama://llama3.2"  # Note this value is overridden by the argparser
+SCRUB_MODEL = "ollama://llama3.2"  # Note this value is overridden by the argparser
+CHECKER_MODEL = "ollama://llama3.2"  # Model used to check results
+TRANSLATOR_MODEL = "ollama://llama3.2"
 
-OLLAMA_CTX = 8192
+OLLAMA_CTX = 30000
 
 OLLAMA_HOST = "127.0.0.1:11434"
 
 SEED = 12  # Note this value is overridden by the argparser
 
-TRANSLATE_LANGUAGE = ""  # If the user wants to translate, this'll be changed from empty to a language e.g 'French' or 'Russian'
-TRANSLATE_PROMPT_LANGUAGE = ""  # If the user wants to translate their prompt, this'll be changed from empty to a language e.g 'French' or 'Russian'
+TRANSLATE_LANGUAGE = "Chinese"  # If the user wants to translate, this'll be changed from empty to a language e.g 'French' or 'Russian'
+TRANSLATE_PROMPT_LANGUAGE = "Chinese"  # If the user wants to translate their prompt, this'll be changed from empty to a language e.g 'French' or 'Russian'
 
 OUTLINE_QUALITY = 87  # Note this value is overridden by the argparser
 OUTLINE_MIN_REVISIONS = 0  # Note this value is overridden by the argparser

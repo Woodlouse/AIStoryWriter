@@ -137,7 +137,7 @@ class Interface:
         for i in range(len(_Messages) - 1, 0, -1):
             if _Messages[i]["content"].strip() == "":
                 del _Messages[i]
-
+        print(f"size(_Messages)={len(_Messages)}")
         NewMsg = self.ChatAndStreamResponse(_Logger, _Messages, _Model, _SeedOverride, _Format)
 
         while (self.GetLastMessageText(NewMsg).strip() == "") or (len(self.GetLastMessageText(NewMsg).split(" ")) < _MinWordCount):
@@ -146,7 +146,8 @@ class Interface:
             elif (len(self.GetLastMessageText(NewMsg).split(" ")) < _MinWordCount):
                 _Logger.Log(f"SafeGenerateText: Generation Failed Due To Short Response ({len(self.GetLastMessageText(NewMsg).split(' '))}, min is {_MinWordCount}), Reattempting Output", 7)
 
-            del _Messages[-1] # Remove failed attempt
+            _Messages.pop() # Remove failed attempt
+            print(f"size(_Messages)={len(_Messages)}")
             NewMsg = self.ChatAndStreamResponse(_Logger, _Messages, _Model, random.randint(0, 99999), _Format)
 
         return NewMsg
@@ -207,7 +208,7 @@ class Interface:
         AvgCharsPerToken = 5  # estimated average chars per token
         EstimatedTokens = TotalChars / AvgCharsPerToken
         _Logger.Log(
-            f"Using Model '{ProviderModel}' from '{Provider}@{ModelHost}' | (Est. ~{EstimatedTokens}tok Context Length)",
+            f"Using Model '{ProviderModel}' from '{Provider}@{ModelHost}' | (Est. ~{EstimatedTokens}tok Context Length) | MessageCount:{len(_Messages)}",
             4,
         )
 
