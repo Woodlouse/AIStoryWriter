@@ -376,17 +376,19 @@ for Chapter in NewChapters:
 Messages = []
 Messages.append(Interface.BuildUserQuery(Outline))
 Info = Writer.StoryInfo.GetStoryInfo(Interface, SysLogger, Messages)
-Title = Info["Title"]
-StoryInfoJSON.update({"Title": Info["Title"]})
-Summary = Info["Summary"]
-StoryInfoJSON.update({"Summary": Info["Summary"]})
-Tags = Info["Tags"]
-StoryInfoJSON.update({"Tags": Info["Tags"]})
-
+Title = Info["标题"]
+StoryInfoJSON.update({"Title": Info["标题"]})
+Summary = Info["摘要"]
+StoryInfoJSON.update({"Summary": Info["摘要"]})
+Tags = Info["标签"]
+StoryInfoJSON.update({"Tags": Info["标签"]})
+Score = Info["整体评分"]
+StoryInfoJSON.update({"Score": Info["整体评分"]})
 print("---------------------------------------------")
 print(f"Story Title: {Title}")
 print(f"Summary: {Summary}")
 print(f"Tags: {Tags}")
+print(f"Score: {Score}")
 print("---------------------------------------------")
 
 ElapsedTime = time.time() - StartTime
@@ -401,6 +403,7 @@ StatsString += " - Total Words: " + str(TotalWords) + "  \n"
 StatsString += f" - Title: {Title}  \n"
 StatsString += f" - Summary: {Summary}  \n"
 StatsString += f" - Tags: {Tags}  \n"
+StatsString += f" - Score: {Score}  \n"
 StatsString += f" - Generation Start Date: {datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')}  \n"
 StatsString += f" - Generation Total Time: {ElapsedTime}s  \n"
 StatsString += f" - Generation Average WPM: {60 * (TotalWords/ElapsedTime)}  \n"

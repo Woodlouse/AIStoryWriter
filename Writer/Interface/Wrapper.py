@@ -172,25 +172,28 @@ class Interface:
 
 
 
-    def SafeGenerateJSON(self, _Logger, _Messages, _Model:str, _SeedOverride:int = -1, _RequiredAttribs:list = []):
+    def SafeGenerateJSON(self, _Logger, _Messages, _Model:str, _SeedOverride:int = -1, _RequiredAttribs:list = None):
+        # 初始化默认值
+        if _RequiredAttribs is None:
+            _RequiredAttribs = []
 
         while True:
             Response = self.SafeGenerateText(_Logger, _Messages, _Model, _SeedOverride, _Format = "JSON")
             try:
-
-                # Check that it returned valid json
+                # 检查返回的是否为有效的JSON
                 JSONResponse = json.loads(self.GetLastMessageText(Response))
-
-                # Now ensure it has the right attributes
+                
+                # 确保包含所需的属性
                 for _Attrib in _RequiredAttribs:
-                    JSONResponse[_Attrib]
+                    if _Attrib not in JSONResponse:
+                        raise KeyError(f"缺少必需的属性: {_Attrib}")
 
-                # Now return the json
+                # 返回JSON
                 return Response, JSONResponse
 
             except Exception as e:
-                _Logger.Log(f"JSON Error during parsing: {e}", 7)
-                _Messages.pop() # Remove failed attempt
+                _Logger.Log(f"JSON解析错误: {e}", 7)
+                _Messages.pop() # 移除失败的尝试
                 Response = self.ChatAndStreamResponse(_Logger, _Messages, _Model, random.randint(0, 99999), _Format = "JSON")
 
 

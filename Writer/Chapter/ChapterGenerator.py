@@ -316,10 +316,17 @@ def GenerateChapter(
         )
         Rating = Writer.LLMEditor.GetChapterRating(Interface, _Logger, Chapter)
 
+        # 检查是否达到最大迭代次数
         if Iterations > Writer.Config.CHAPTER_MAX_REVISIONS:
+            _Logger.Log(f"达到最大修改次数 {Writer.Config.CHAPTER_MAX_REVISIONS}", 4)
             break
-        if (Iterations > Writer.Config.CHAPTER_MIN_REVISIONS) and (Rating == True):
+        
+        # 检查是否满足质量要求
+        if (Iterations > Writer.Config.CHAPTER_MIN_REVISIONS) and (Rating >= _QualityThreshold):
+            _Logger.Log(f"达到质量要求 (评分: {Rating}, 阈值: {_QualityThreshold})", 4)
             break
+        
+        # 继续修改
         Chapter, WritingHistory = ReviseChapter(
             Interface, _Logger, Chapter, Feedback, WritingHistory
         )
