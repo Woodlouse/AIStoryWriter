@@ -28,13 +28,13 @@ SEED = 12  # Note this value is overridden by the argparser
 TRANSLATE_LANGUAGE = "Chinese"  # If the user wants to translate, this'll be changed from empty to a language e.g 'French' or 'Russian'
 TRANSLATE_PROMPT_LANGUAGE = "Chinese"  # If the user wants to translate their prompt, this'll be changed from empty to a language e.g 'French' or 'Russian'
 
-OUTLINE_QUALITY = 87  # Note this value is overridden by the argparser
-OUTLINE_MIN_REVISIONS = 0  # Note this value is overridden by the argparser
-OUTLINE_MAX_REVISIONS = 3  # Note this value is overridden by the argparser
+OUTLINE_QUALITY = 99  # Note this value is overridden by the argparser
+OUTLINE_MIN_REVISIONS = 1  # Note this value is overridden by the argparser
+OUTLINE_MAX_REVISIONS = 2  # Note this value is overridden by the argparser
 CHAPTER_NO_REVISIONS = True  # Note this value is overridden by the argparser # disables all revision checks for the chapter, overriding any other chapter quality/revision settings
-CHAPTER_QUALITY = 85  # Note this value is overridden by the argparser
+CHAPTER_QUALITY = 99  # Note this value is overridden by the argparser
 CHAPTER_MIN_REVISIONS = 1  # Note this value is overridden by the argparser
-CHAPTER_MAX_REVISIONS = 3  # Note this value is overridden by the argparser
+CHAPTER_MAX_REVISIONS = 2  # Note this value is overridden by the argparser
 
 SCRUB_NO_SCRUB = False  # Note this value is overridden by the argparser
 EXPAND_OUTLINE = False  # Note this value is overridden by the argparser
