@@ -37,17 +37,23 @@ def _generate_initial_outline(Interface, _Logger, _OutlinePrompt: str, story_ele
 def _revise_outline_with_feedback(Interface, _Logger, outline: str, iterations: int = 0) -> Tuple[str, bool]:
     """根据反馈修改大纲"""
     try:
+        # 首先检查迭代次数是否超过最大值
+        if iterations >= Writer.Config.OUTLINE_MAX_REVISIONS:
+            _Logger.Log("Reached maximum revision attempts", 3)
+            # 在达到最大迭代次数时，返回当前大纲和质量评估结果
+            meets_standards = Writer.LLMEditor.GetOutlineRating(Interface, _Logger, outline)
+            return outline, meets_standards
+
+        # 获取反馈和质量评估
         feedback = Writer.LLMEditor.GetFeedbackOnOutline(Interface, _Logger, outline)
         meets_standards = Writer.LLMEditor.GetOutlineRating(Interface, _Logger, outline)
         
-        if iterations >= Writer.Config.OUTLINE_MAX_REVISIONS:
-            _Logger.Log("Reached maximum revision attempts", 3)
-            return outline, meets_standards
-            
+        # 如果达到最小迭代次数且满足质量标准，则返回
         if iterations >= Writer.Config.OUTLINE_MIN_REVISIONS and meets_standards:
             _Logger.Log("Quality standards met", 4)
             return outline, meets_standards
-            
+        
+        # 否则继续修改大纲
         revised_outline, _ = ReviseOutline(Interface, _Logger, outline, feedback)
         return _revise_outline_with_feedback(Interface, _Logger, revised_outline, iterations + 1)
         

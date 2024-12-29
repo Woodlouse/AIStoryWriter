@@ -36,13 +36,13 @@ def GetOutlineRating(
         _Outline=_Outline
     )
 
-    _Logger.Log("Prompting LLM To Get Review JSON", 5)
+    _Logger.Log("正在请求 LLM 评估大纲质量...", 5)
 
     History.append(Interface.BuildUserQuery(StartingPrompt))
     History = Interface.SafeGenerateText(
         _Logger, History, Writer.Config.EVAL_MODEL, _Format="json"
     )
-    _Logger.Log("Finished Getting Review JSON", 5)
+    _Logger.Log("已收到大纲评估结果", 5)
 
     Iters: int = 0
     while True:
@@ -54,20 +54,20 @@ def GetOutlineRating(
         try:
             Iters += 1
             Rating = json.loads(RawResponse)["IsComplete"]
-            _Logger.Log(f"Editor Determined IsComplete: {Rating}", 5)
+            _Logger.Log(f"大纲评估结果: {Rating} (经过 {Iters} 次尝试)", 5)
             return Rating
         except Exception as E:
             if Iters > 4:
-                _Logger.Log("Critical Error Parsing JSON", 7)
+                _Logger.Log(f"JSON 解析失败，已达到最大重试次数 (5次)", 7)
                 return False
-            _Logger.Log("Error Parsing JSON Written By LLM, Asking For Edits", 7)
+            _Logger.Log(f"第 {Iters} 次解析 JSON 失败: {str(E)}, 正在重试...", 7)
             EditPrompt: str = Writer.Prompts.JSON_PARSE_ERROR.format(_Error=E)
             History.append(Interface.BuildUserQuery(EditPrompt))
-            _Logger.Log("Asking LLM TO Revise", 7)
+            _Logger.Log("请求 LLM 修正 JSON 格式", 7)
             History = Interface.SafeGenerateText(
                 _Logger, History, Writer.Config.EVAL_MODEL, _Format="json"
             )
-            _Logger.Log("Done Asking LLM TO Revise JSON", 6)
+            _Logger.Log("已收到修正后的 JSON", 6)
 
 
 def GetFeedbackOnChapter(Interface, _Logger, _Chapter: str, _Outline: str):
@@ -106,12 +106,12 @@ def GetChapterRating(Interface, _Logger, _Chapter: str):
         _Chapter=_Chapter
     )
 
-    _Logger.Log("Prompting LLM To Get Review JSON", 5)
+    _Logger.Log("正在请求 LLM 评估章节质量...", 5)
     History.append(Interface.BuildUserQuery(StartingPrompt))
     History = Interface.SafeGenerateText(
         _Logger, History, Writer.Config.EVAL_MODEL
     )
-    _Logger.Log("Finished Getting Review JSON", 5)
+    _Logger.Log("已收到章节评估结果", 5)
 
     Iters: int = 0
     while True:
@@ -122,19 +122,20 @@ def GetChapterRating(Interface, _Logger, _Chapter: str):
 
         try:
             Iters += 1
+            _Logger.Log(f"正在解析章节评估结果 (第 {Iters} 次尝试)", 5)
             Rating = json.loads(RawResponse)["IsComplete"]
-            _Logger.Log(f"Editor Determined IsComplete: {Rating}", 5)
+            _Logger.Log(f"章节评估结果: {Rating} (经过 {Iters} 次尝试)", 5)
             return Rating
         except Exception as E:
             if Iters > 4:
-                _Logger.Log("Critical Error Parsing JSON", 7)
+                _Logger.Log(f"JSON 解析失败，已达到最大重试次数 (5次)", 7)
                 return False
 
-            _Logger.Log("Error Parsing JSON Written By LLM, Asking For Edits", 7)
+            _Logger.Log(f"第 {Iters} 次解析 JSON 失败: {str(E)}, 正在重试...", 7)
             EditPrompt: str = Writer.Prompts.JSON_PARSE_ERROR.format(_Error=E)
             History.append(Interface.BuildUserQuery(EditPrompt))
-            _Logger.Log("Asking LLM TO Revise", 7)
+            _Logger.Log("请求 LLM 修正 JSON 格式", 7)
             History = Interface.SafeGenerateText(
                 _Logger, History, Writer.Config.EVAL_MODEL
             )
-            _Logger.Log("Done Asking LLM TO Revise JSON", 6)
+            _Logger.Log("已收到修正后的 JSON", 6)

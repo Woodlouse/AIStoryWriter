@@ -12,8 +12,8 @@ def LLMSummaryCheck(Interface, _Logger, _RefSummary: str, _Work: str):
     """
 
     # LLM Length Check - Firstly, check if the length of the response was at least 100 words.
-    # 使用更准确的单词计数方法
-    if len(_Work) < 100:
+    # 使用空格分割计算单词数，对于英文文本更准确
+    if len(_Work.split()) < 100:
         _Logger.Log(
             "Previous response didn't meet the length requirement, so it probably tried to cheat around writing.",
             7,

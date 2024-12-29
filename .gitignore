@@ -25,6 +25,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+Temp/
+Stories/
+ExamplePrompts/
+.DS_Store
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -164,3 +168,4 @@ Stories/*
 Prompts/*
 Logs/*
 EvalLogs/*
+.DS_Store

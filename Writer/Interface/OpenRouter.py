@@ -155,45 +155,43 @@ class OpenRouter:
                 response.raise_for_status()  # Raises an HTTPError if the HTTP request returned an unsuccessful status code
                 if 'choices' in response.json():
                     # Return result from request
+                    print(f"成功获得响应 (尝试次数: {retries + 1})")
                     return response.json()["choices"][0]["message"]["content"]
                 elif 'error' in response.json():
-                    print(f"Openrouter returns error '{response.json()['error']['code']}' with message '{response.json()['error']['message']}', retry attempt {retries + 1}.")
+                    print(f"OpenRouter 返回错误 '{response.json()['error']['code']}': {response.json()['error']['message']} (第 {retries + 1}/{max_retries} 次尝试)")
                     if response.json()['error']['code'] == 400:
-                        print("Bad Request (invalid or missing params, CORS)")
+                        print("错误原因: 请求参数无效或缺失，或 CORS 问题")
                     if response.json()['error']['code'] == 401:
-                        raise Exception ("Invalid credentials (OAuth session expired, disabled/invalid API key)")
+                        raise Exception("认证失败: API 密钥无效或已过期")
                     if response.json()['error']['code'] == 402:
-                        raise Exception ("Your account or API key has insufficient credits. Add more credits and retry the request.")   
+                        raise Exception("账户余额不足，请充值后重试")   
                     if response.json()['error']['code'] == 403:
-                        print("Your chosen model requires moderation and your input was flagged")
+                        print("内容审核未通过，请修改输入内容")
                     if response.json()['error']['code'] == 408:
-                        print("Your request timed out")
+                        print("请求超时，正在重试...")
                     if response.json()['error']['code'] == 429:
-                        print("You are being rate limited")
-                        print("Waiting 10 seconds")
+                        print("触发频率限制，等待 10 秒后重试...")
                         time.sleep(10)
                     if response.json()['error']['code'] == 502:
-                        print("Your chosen model is down or we received an invalid response from it")
+                        print("模型服务异常或返回无效响应")
                     if response.json()['error']['code'] == 503:
-                        print("There is no available model provider that meets your routing requirements")
+                        print("没有找到符合路由要求的可用模型")
                 else:
                     from pprint import pprint
-                    print(f"Response without error but missing choices, retry attempt {retries + 1}.")
+                    print(f"响应中缺少必要字段 'choices'，正在重试... (第 {retries + 1}/{max_retries} 次)")
                     pprint(response.json())
             except requests.exceptions.HTTPError as http_err:
-                # HTTP error status code
-                print(f"HTTP error occurred: '{http_err}' - Status Code: '{http_err.response.status_code}', retry attempt {retries + 1}.")
-                # Funny Cloudflare being funny.
-                # This is a lie: https://community.cloudflare.com/t/community-tip-fixing-error-524-a-timeout-occurred/42342
+                print(f"HTTP 错误: {http_err} - 状态码: {http_err.response.status_code} (第 {retries + 1}/{max_retries} 次尝试)")
                 if http_err.response.status_code == 524:
+                    print("Cloudflare 超时，等待 10 秒后重试...")
                     time.sleep(10)
             except (requests.exceptions.Timeout, requests.exceptions.TooManyRedirects) as err:
-                # timeouts and redirects
-                print(f"Retry attempt {retries + 1} after error: '{err}'")
+                print(f"第 {retries + 1}/{max_retries} 次尝试失败: {err}")
             except requests.exceptions.RequestException as req_err:
-                # any other request errors that haven't been caught by the previous except blocks
-                print(f"An error occurred while making the request: '{req_err}', retry attempt {retries + 1}.")
+                print(f"请求异常: {req_err} (第 {retries + 1}/{max_retries} 次尝试)")
             except Exception as e:
-                # all other exceptions
-                print(f"An unexpected error occurred: '{e}', retry attempt {retries + 1}.")
+                print(f"未预期的错误: {e} (第 {retries + 1}/{max_retries} 次尝试)")
             retries += 1
+        
+        print(f"达到最大重试次数 ({max_retries} 次)，操作失败")
+        return None

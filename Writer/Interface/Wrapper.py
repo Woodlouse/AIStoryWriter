@@ -123,18 +123,30 @@ class Interface:
     def count_words(self, text: str) -> int:
         """
         更准确地计算文本中的单词数量
-        支持英文分词和简单的CJK字符计数
+        使用jieba进行中文分词
+        支持混合文本（中英文混合）
         """
         text = text.strip()
         if not text:
             return 0
             
+        try:
+            import jieba
+        except ImportError:
+            self.ensure_package_is_installed("jieba")
+            import jieba
+            
         # 检查是否包含CJK字符
-        if any(u'\u4e00' <= char <= u'\u9fff' for char in text):
-            # 对于中文等CJK文字,每个字符视为一个词
-            return len([char for char in text if u'\u4e00' <= char <= u'\u9fff'])
+        has_cjk = any(u'\u4e00' <= char <= u'\u9fff' for char in text)
+        
+        if has_cjk:
+            # 使用jieba进行中文分词
+            words = list(jieba.cut(text))
+            # 过滤掉空白词
+            words = [w for w in words if w.strip()]
+            return len(words)
         else:
-            # 对于英文,使用更robust的分词方式
+            # 对于纯英文文本，使用空格分词
             words = [w for w in text.split() if w.strip()]
             return len(words)
 
@@ -158,15 +170,17 @@ class Interface:
         print(f"size(_Messages)={len(_Messages)}")
         NewMsg = self.ChatAndStreamResponse(_Logger, _Messages, _Model, _SeedOverride, _Format)
 
+        attempts = 1
         while (self.GetLastMessageText(NewMsg).strip() == "") or (self.count_words(self.GetLastMessageText(NewMsg)) < _MinWordCount):
             if self.GetLastMessageText(NewMsg).strip() == "":
-                _Logger.Log("SafeGenerateText: Generation Failed Due To Empty (Whitespace) Response, Reattempting Output", 7)
+                _Logger.Log(f"SafeGenerateText: 生成失败 - 返回空白内容，第 {attempts} 次重试", 7)
             elif (self.count_words(self.GetLastMessageText(NewMsg)) < _MinWordCount):
-                _Logger.Log(f"SafeGenerateText: Generation Failed Due To Short Response ({self.count_words(self.GetLastMessageText(NewMsg))}, min is {_MinWordCount}), Reattempting Output", 7)
+                _Logger.Log(f"SafeGenerateText: 生成失败 - 内容过短 (当前 {self.count_words(self.GetLastMessageText(NewMsg))} 字，最少需要 {_MinWordCount} 字)，第 {attempts} 次重试", 7)
 
             _Messages.pop() # Remove failed attempt
             print(f"size(_Messages)={len(_Messages)}")
             NewMsg = self.ChatAndStreamResponse(_Logger, _Messages, _Model, random.randint(0, 99999), _Format)
+            attempts += 1
 
         return NewMsg
 

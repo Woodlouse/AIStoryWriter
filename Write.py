@@ -59,6 +59,10 @@ def main():
     args = ArgumentParser.parse_args()
     ArgumentParser.update_config(args)
 
+    # 验证生成次数参数
+    if args.Times <= 0:
+        raise ValueError("生成次数必须大于0")
+
     # 获取使用的模型列表
     models = [
         args.InitialOutlineModel,
